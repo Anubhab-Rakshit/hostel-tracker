@@ -291,7 +291,7 @@ export function IssueReportForm() {
                       type="button"
                       onClick={() => setValue("priority", p.id as any, { shouldValidate: true })}
                       className={cn(
-                        "w-full flex items-center justify-between p-6 rounded-xl border transition-all duration-300 group",
+                        "w-full relative flex items-center justify-between p-6 rounded-xl border transition-all duration-300 group",
                         selectedPriority === p.id
                           ? "border-transparent bg-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]"
                           : "border-white/10 hover:bg-white/5"
@@ -352,7 +352,7 @@ export function IssueReportForm() {
                     {errors.title && <p className="text-red-400 text-sm">{errors.title.message}</p>}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="space-y-2">
                       <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Hostel Block</Label>
                       <Input
@@ -361,6 +361,15 @@ export function IssueReportForm() {
                         placeholder="Block A"
                       />
                       {errors.hostel && <p className="text-red-400 text-sm">{errors.hostel.message}</p>}
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Floor</Label>
+                      <Input
+                        {...register("floor")}
+                        className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20"
+                        placeholder="2nd"
+                      />
+                      {errors.floor && <p className="text-red-400 text-sm">{errors.floor.message}</p>}
                     </div>
                     <div className="space-y-2">
                       <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Room No.</Label>

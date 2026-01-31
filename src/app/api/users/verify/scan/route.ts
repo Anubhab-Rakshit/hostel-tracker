@@ -75,6 +75,10 @@ const runPythonScan = async (imagePath: string) => {
     throw new Error(`OCR Script not found at: ${scriptPath}`);
   }
 
+  console.log("OCR Debug: Scanning image at", imagePath);
+  console.log("OCR Debug: Detected Virtual Env Root:", venvRoot);
+  console.log("OCR Debug: Selected Python Path:", pythonPath);
+
   const result = await new Promise<string>((resolve, reject) => {
     // Inherit process.env but ensure we don't break paths on Linux by forcing Mac paths
     // Just extend the existing PATH if needed, or rely on absolute pythonPath
@@ -93,9 +97,14 @@ const runPythonScan = async (imagePath: string) => {
       errorOutput += data.toString();
     });
 
-    child.on("error", (error) => reject(error));
+    child.on("error", (error) => {
+      console.error("OCR Debug: Spawn Error:", error);
+      reject(error);
+    });
     child.on("close", (code) => {
       if (code !== 0) {
+        console.error("OCR Debug: Process exited with code", code);
+        console.error("OCR Debug: stderr:", errorOutput);
         reject(new Error(errorOutput || "Failed to run OCR"));
       } else {
         const trimmed = output.trim();
