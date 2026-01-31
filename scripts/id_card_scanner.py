@@ -19,7 +19,15 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import cv2
-from pyzbar import pyzbar
+# Try importing pyzbar, handle missing shared library gracefully
+try:
+    from pyzbar import pyzbar
+    ZBAR_AVAILABLE = True
+except ImportError:
+    # Print to stderr to avoid breaking JSON output
+    print("Warning: zbar shared library not found. QR code scanning will be disabled.", file=sys.stderr)
+    ZBAR_AVAILABLE = False
+
 import pytesseract
 
 TESSERACT_PATHS = [
