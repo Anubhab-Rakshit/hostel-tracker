@@ -355,6 +355,17 @@ def parse_fields(text: str) -> dict:
         "doc_type": classify_document(text_clean),
     }
 
+import sys
+
+# Try importing pyzbar, handle missing shared library gracefully
+try:
+    from pyzbar import pyzbar
+    ZBAR_AVAILABLE = True
+except ImportError:
+    print("Warning: zbar shared library not found. QR code scanning will be disabled.", file=sys.stderr)
+    ZBAR_AVAILABLE = False
+
+import pytesseract
 
 def resize_image(image: cv2.typing.MatLike, max_dim: int = 1024) -> cv2.typing.MatLike:
     h, w = image.shape[:2]
@@ -380,7 +391,7 @@ def ocr_best(image: cv2.typing.MatLike) -> str:
     best_text = ""
     best_score = -1.0
 
-    print("OCR Debug: Starting rotation check loop...")
+    print("OCR Debug: Starting rotation check loop...", file=sys.stderr)
     for angle, rotated in rotations:
         gray = cv2.cvtColor(rotated, cv2.COLOR_BGR2GRAY)
         # Faster preprocessing
@@ -394,7 +405,7 @@ def ocr_best(image: cv2.typing.MatLike) -> str:
         confs = [float(c) for c in data.get("conf", []) if c != "-1"]
         score = (sum(confs) / len(confs)) if confs else 0.0
         
-        print(f"OCR Debug: Angle {angle} score: {score:.2f}")
+        print(f"OCR Debug: Angle {angle} score: {score:.2f}", file=sys.stderr)
 
         if score > best_score:
             # Only extract full text if this angle looks promising
@@ -405,7 +416,7 @@ def ocr_best(image: cv2.typing.MatLike) -> str:
 
         # Early exit if we have a very high confidence result
         if score > 80:
-             print("OCR Debug: High confidence match found, stopping rotations.")
+             print("OCR Debug: High confidence match found, stopping rotations.", file=sys.stderr)
              break
 
     return best_text
@@ -573,16 +584,24 @@ def scan_camera(camera_index: int = 0) -> ScanResult:
 def scan_image(image_path: str) -> ScanResult:
     path = Path(image_path)
     if not path.exists():
-        raise RuntimeError("Image file not found")
+        print(f"OCR Debug: Image file not found at {image_path}", file=sys.stderr)
+        return ScanResult(raw_text="", qr_data=None, name=None, hostel_id=None, hostel=None, college=None, block=None, floor=None, room=None, dob=None, phone=None, doc_type=None)
 
+    print(f"OCR Debug: Scanning image at {image_path}", file=sys.stderr)
     image = cv2.imread(str(path))
     if image is None:
-        raise RuntimeError("Unable to read image")
+        print(f"OCR Debug: Unable to read image from {image_path}", file=sys.stderr)
+        return ScanResult(raw_text="", qr_data=None, name=None, hostel_id=None, hostel=None, college=None, block=None, floor=None, room=None, dob=None, phone=None, doc_type=None)
 
+    # 1. Decode QR/Barcode if zbar is available
     qr_data = None
-    barcodes = pyzbar.decode(image)
-    if barcodes:
-        qr_data = barcodes[0].data.decode("utf-8", errors="ignore")
+    if ZBAR_AVAILABLE:
+        try:
+            barcodes = pyzbar.decode(image)
+            if barcodes:
+                qr_data = barcodes[0].data.decode("utf-8", errors="ignore")
+        except Exception as e:
+            print(f"Warning: QR scan failed: {e}", file=sys.stderr)
 
     ocr_text = ocr_best(image)
     # Use resized for header extraction too, it's heuristics based
