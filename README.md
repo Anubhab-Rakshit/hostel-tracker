@@ -7,10 +7,31 @@ A comprehensive, modern hostel management and issue tracking platform built with
 ![MongoDB](https://img.shields.io/badge/MongoDB-7-green?style=for-the-badge&logo=mongodb)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38B2AC?style=for-the-badge&logo=tailwind-css)
 
+---
+
+## 📌 Table of Contents
+- [Link](#link)
+- [✨ Features](#-features)
+- [🖼️ Product Screens](#-product-screens)
+- [🚀 Getting Started](#-getting-started)
+- [📁 Project Structure](#-project-structure)
+- [🔐 User Roles](#-user-roles)
+- [🎨 UI Components](#-ui-components)
+- [⌨️ Keyboard Shortcuts](#-keyboard-shortcuts)
+- [🛠️ Tech Stack](#-tech-stack)
+- [🧭 Application Workflows](#-application-workflows)
+- [🧪 Workflows (CI/CD)](#-workflows-cicd)
+- [⚙️ Scripts](#-scripts)
+- [📝 API Endpoints](#-api-endpoints)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+- [🙏 Acknowledgments](#-acknowledgments)
+
 ## Link
 
 ### Video Link :- https://drive.google.com/file/d/1BeXVOo75PHkjus-Z-VYCC_Qq8nKXp53z/view?usp=sharing
 ### Deployment Link :- https://hostel-tracker-rusz.onrender.com/ (it can take upto 1 min+ to load as we have free tier of hosting on render)
+✅ Deployed on Render
 
 
 ## ✨ Features
@@ -51,7 +72,9 @@ A comprehensive, modern hostel management and issue tracking platform built with
 - **Responsive Design** - Works on all device sizes
 - **Email Notifications** - Automated emails for updates
 
+---
 
+## 🖼️ Product Screens
 <img width="1437" height="758" alt="image" src="https://github.com/user-attachments/assets/3802190c-599b-41d0-9836-bb6c12209800" />
 
 <img width="1509" height="751" alt="image" src="https://github.com/user-attachments/assets/1ff486e9-102e-4434-9edd-aaebd1858679" />
@@ -119,6 +142,31 @@ npm run dev
 
 5. **Open the application**
 Visit [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 🧭 Application Workflows
+
+### 🧑‍🎓 Student Flow
+1. Sign up / log in
+2. Scan QR code or choose location
+3. Report issue with image/voice note
+4. Track status updates and comment
+5. Earn karma points on resolved issues
+
+### 🧑‍💼 Management Flow
+1. Review incoming issues
+2. Assign to maintenance staff
+3. Announce updates to hostel
+4. Monitor analytics and hotspots
+5. Review staff performance
+
+### 🧑‍🔧 Maintenance Flow
+1. Receive assigned tasks
+2. Move tasks across Kanban stages
+3. Update status with notes
+4. Close tasks with evidence
+5. Improve leaderboard rank
 
 ## 📁 Project Structure
 
@@ -236,6 +284,131 @@ Built with shadcn/ui and custom components:
 - **QR Codes**: qrcode
 - **Forms**: React Hook Form, Zod
 - **Icons**: Lucide React
+
+---
+
+## 🧪 Workflows (CI/CD)
+
+Below are **multiple GitHub Actions workflows** you can drop into `.github/workflows/` to keep quality high and releases stable. These are production-ready, minimal, and aligned with this Next.js + TypeScript stack.
+
+### ✅ 1) CI: Lint + Build + Typecheck
+```yaml
+name: CI
+on:
+	push:
+		branches: ["main"]
+	pull_request:
+jobs:
+	ci:
+		runs-on: ubuntu-latest
+		steps:
+			- uses: actions/checkout@v4
+			- uses: actions/setup-node@v4
+				with:
+					node-version: 20
+					cache: "npm"
+			- run: npm ci
+			- run: npm run lint
+			- run: npm run build
+```
+
+### ✅ 2) PR Quality Gate (fast checks)
+```yaml
+name: PR Quality Gate
+on:
+	pull_request:
+jobs:
+	quick-checks:
+		runs-on: ubuntu-latest
+		steps:
+			- uses: actions/checkout@v4
+			- uses: actions/setup-node@v4
+				with:
+					node-version: 20
+					cache: "npm"
+			- run: npm ci
+			- run: npm run lint
+```
+
+### ✅ 3) Security: Dependency Review
+```yaml
+name: Dependency Review
+on:
+	pull_request:
+jobs:
+	dependency-review:
+		runs-on: ubuntu-latest
+		steps:
+			- uses: actions/checkout@v4
+			- uses: actions/dependency-review-action@v4
+```
+
+### ✅ 4) Nightly Build (scheduled)
+```yaml
+name: Nightly Build
+on:
+	schedule:
+		- cron: "0 2 * * *"
+jobs:
+	nightly:
+		runs-on: ubuntu-latest
+		steps:
+			- uses: actions/checkout@v4
+			- uses: actions/setup-node@v4
+				with:
+					node-version: 20
+					cache: "npm"
+			- run: npm ci
+			- run: npm run build
+```
+
+### ✅ 5) Release Build (manual)
+```yaml
+name: Release Build
+on:
+	workflow_dispatch:
+jobs:
+	release:
+		runs-on: ubuntu-latest
+		steps:
+			- uses: actions/checkout@v4
+			- uses: actions/setup-node@v4
+				with:
+					node-version: 20
+					cache: "npm"
+			- run: npm ci
+			- run: npm run build
+```
+
+### ✅ 6) Docker Build (optional)
+```yaml
+name: Docker Build
+on:
+	push:
+		branches: ["main"]
+jobs:
+	docker:
+		runs-on: ubuntu-latest
+		steps:
+			- uses: actions/checkout@v4
+			- uses: docker/setup-buildx-action@v3
+			- uses: docker/build-push-action@v5
+				with:
+					push: false
+					tags: hostel-issue:latest
+```
+
+---
+
+## ⚙️ Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | Lint codebase |
+| `npm run db:seed` | Seed database |
 
 ## 📝 API Endpoints
 
