@@ -37,20 +37,24 @@ else:
             break
 
 
+from typing import Optional, List, Dict, Set, Tuple # Added for compatibility
+
 @dataclass
 class ScanResult:
     raw_text: str
-    qr_data: str | None
-    name: str | None
-    hostel_id: str | None
-    hostel: str | None
-    college: str | None
-    block: str | None
-    floor: str | None
-    room: str | None
-    dob: str | None
-    phone: str | None
-    doc_type: str | None
+    qr_data: Optional[str]
+    name: Optional[str]
+    hostel_id: Optional[str]
+    hostel: Optional[str]
+    college: Optional[str]
+    block: Optional[str]
+    floor: Optional[str]
+    room: Optional[str]
+    dob: Optional[str]
+    phone: Optional[str]
+    doc_type: Optional[str]
+
+
 
 
 def normalize_text(text: str) -> str:
@@ -100,7 +104,7 @@ def parse_fields(text: str) -> dict:
         )
         return cleaned.strip(" -:")
 
-    def infer_college_from_header() -> str | None:
+    def infer_college_from_header() -> Optional[str]:
         header_lines = lines[:6]
         if not header_lines:
             return None
@@ -178,9 +182,9 @@ def parse_fields(text: str) -> dict:
     def find_after_label(
         label_pattern: str,
         value_pattern: str,
-        skip_terms: set[str] | None = None,
+        skip_terms: Optional[set] = None,
         validator=None,
-    ) -> str | None:
+    ) -> Optional[str]:
         pattern = re.compile(label_pattern, re.IGNORECASE)
         value_re = re.compile(value_pattern, re.IGNORECASE)
         skip_terms = skip_terms or set()
@@ -240,7 +244,7 @@ def parse_fields(text: str) -> dict:
             college_header = line.split(":", 1)[1].strip()
             break
 
-    def sanitize_college(value: str | None) -> str | None:
+    def sanitize_college(value: Optional[str]) -> Optional[str]:
         if not value:
             return None
         cleaned = re.sub(r"[^A-Za-z&.,'\s-]", " ", value)
@@ -384,7 +388,7 @@ def ocr_best(image: cv2.typing.MatLike) -> str:
     return best_text
 
 
-def extract_prominent_header(image: cv2.typing.MatLike) -> str | None:
+def extract_prominent_header(image: cv2.typing.MatLike) -> Optional[str]:
     rotations = [
         image,
         cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE),
