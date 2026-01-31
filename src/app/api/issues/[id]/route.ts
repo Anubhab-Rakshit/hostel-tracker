@@ -134,6 +134,16 @@ export async function PATCH(
           );
         }
         updates.status = status;
+
+        // Explicitly set resolvedAt if status is resolved (bypassing pre-save hook)
+        if (status === "resolved") {
+          const now = new Date();
+          updates.resolvedAt = now;
+          // Calculate resolution time in hours
+          const created = new Date(issue.createdAt);
+          updates.resolutionTime = Math.max((now.getTime() - created.getTime()) / (1000 * 60 * 60), 0);
+        }
+
         updates.$push = {
           statusHistory: {
             status,
