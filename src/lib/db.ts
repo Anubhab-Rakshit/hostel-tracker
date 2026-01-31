@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 mongoose.set("strictPopulate", false);
 
-const MONGODB_URI = process.env.MONGODB_URI!;
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/hostel_tracker";
 
-if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable");
+if (!process.env.MONGODB_URI) {
+  console.warn("MONGODB_URI not defined, using fallback for build/dev");
 }
 
 interface MongooseCache {
