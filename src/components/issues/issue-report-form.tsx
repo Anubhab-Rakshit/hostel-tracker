@@ -346,22 +346,31 @@ export function IssueReportForm() {
                   {errors.title && <p className="text-red-400 text-sm">{errors.title.message}</p>}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Hostel Block</Label>
+                    <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Hostel</Label>
                     <Input
                       {...register("hostel")}
                       className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20"
-                      placeholder="Block A"
+                      placeholder="e.g. Boys Hostel 1"
                     />
                     {errors.hostel && <p className="text-red-400 text-sm">{errors.hostel.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Block</Label>
+                    <Input
+                      {...register("block")}
+                      className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20"
+                      placeholder="e.g. Block A"
+                    />
+                    {errors.block && <p className="text-red-400 text-sm">{errors.block.message}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Floor</Label>
                     <Input
                       {...register("floor")}
                       className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20"
-                      placeholder="2nd"
+                      placeholder="e.g. 2nd Floor"
                     />
                     {errors.floor && <p className="text-red-400 text-sm">{errors.floor.message}</p>}
                   </div>
@@ -370,7 +379,7 @@ export function IssueReportForm() {
                     <Input
                       {...register("room")}
                       className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20"
-                      placeholder="101"
+                      placeholder="e.g. 101"
                     />
                     {errors.room && <p className="text-red-400 text-sm">{errors.room.message}</p>}
                   </div>
