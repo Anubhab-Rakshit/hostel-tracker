@@ -7,6 +7,12 @@ A comprehensive, modern hostel management and issue tracking platform built with
 ![MongoDB](https://img.shields.io/badge/MongoDB-7-green?style=for-the-badge&logo=mongodb)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38B2AC?style=for-the-badge&logo=tailwind-css)
 
+## Link
+
+### Video Link :- https://drive.google.com/file/d/1BeXVOo75PHkjus-Z-VYCC_Qq8nKXp53z/view?usp=sharing
+### Deployment Link :- https://hostel-tracker-rusz.onrender.com/ (it can take upto 1 min+ to load as we have free tier of hosting on render)
+
+
 ## ✨ Features
 
 ### 🎯 Core Features
@@ -44,6 +50,21 @@ A comprehensive, modern hostel management and issue tracking platform built with
 - **Search** - Global search across issues, announcements, and more
 - **Responsive Design** - Works on all device sizes
 - **Email Notifications** - Automated emails for updates
+
+
+<img width="1437" height="758" alt="image" src="https://github.com/user-attachments/assets/3802190c-599b-41d0-9836-bb6c12209800" />
+
+<img width="1509" height="751" alt="image" src="https://github.com/user-attachments/assets/1ff486e9-102e-4434-9edd-aaebd1858679" />
+
+<img width="1505" height="763" alt="image" src="https://github.com/user-attachments/assets/4b2dbf24-0141-4b22-8f3d-11abcc4ff4fe" />
+
+<img width="1512" height="754" alt="image" src="https://github.com/user-attachments/assets/0e6ac91d-74a4-4b71-a401-ceb2981c637b" />
+
+<img width="1508" height="750" alt="image" src="https://github.com/user-attachments/assets/44003cb3-a1de-4497-a59a-2d83f5a8e271" />
+
+
+
+
 
 ## 🚀 Getting Started
 
