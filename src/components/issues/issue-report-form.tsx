@@ -210,7 +210,7 @@ export function IssueReportForm() {
 
       {/* Main Console Interface */}
       <div className="flex-1 w-full">
-        <form onSubmit={handleSubmit(onSubmit)} className="p-8 md:p-10 rounded-3xl bg-black/60 border border-white/10 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-8 md:p-10 rounded-3xl bg-black/60 border border-white/10 backdrop-blur-xl shadow-2xl relative overflow-hidden text-white">
           {/* Background Grid */}
           <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
           <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 via-transparent to-transparent pointer-events-none" />
@@ -219,251 +219,241 @@ export function IssueReportForm() {
           <input type="hidden" {...register("category")} />
           <input type="hidden" {...register("priority")} />
 
-          <AnimatePresence mode="wait">
-            {step === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="space-y-8 relative z-10"
-              >
-                <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                  <div>
-                    <h3 className="text-3xl font-bold text-white tracking-tight">Select Protocol</h3>
-                    <p className="text-white/50 mt-1">Categorize the anomaly for routing.</p>
-                  </div>
-                  <Badge variant="outline" className="border-indigo-500/50 text-indigo-400">Step 1/4</Badge>
+          {/* Steps Content */}
+          {step === 1 && (
+            <div
+              key="step1"
+              className="space-y-8 relative z-10"
+            >
+              <div className="flex justify-between items-end border-b border-white/10 pb-4">
+                <div>
+                  <h3 className="text-3xl font-bold text-white tracking-tight">Select Protocol</h3>
+                  <p className="text-white/50 mt-1">Categorize the anomaly for routing.</p>
                 </div>
+                <Badge variant="outline" className="border-indigo-500/50 text-indigo-400">Step 1/4</Badge>
+              </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                  {ISSUE_CATEGORIES.map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => setValue("category", cat.id, { shouldValidate: true })}
-                      className={cn(
-                        "group relative p-6 rounded-xl border transition-all duration-300 flex flex-col items-center gap-4 text-center overflow-hidden",
-                        selectedCategory === cat.id
-                          ? "bg-indigo-500/20 border-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.2)]"
-                          : "bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10"
-                      )}
-                    >
-                      <div className={cn(
-                        "p-4 rounded-full transition-all duration-300 group-hover:scale-110",
-                        selectedCategory === cat.id ? "bg-indigo-500 text-white" : "bg-white/10 text-white/70"
-                      )}>
-                        {categoryIcons[cat.id]}
-                      </div>
-                      <span className={cn("font-medium", selectedCategory === cat.id ? "text-white" : "text-white/60")}>
-                        {cat.name}
-                      </span>
-                      {selectedCategory === cat.id && (
-                        <motion.div layoutId="selection-ring" className="absolute inset-0 border-2 border-indigo-500 rounded-xl pointer-events-none" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-                {errors.category && <p className="text-red-400 text-sm animate-pulse">{errors.category.message}</p>}
-              </motion.div>
-            )}
-
-            {step === 2 && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="space-y-8 relative z-10"
-              >
-                <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                  <div>
-                    <h3 className="text-3xl font-bold text-white tracking-tight">Urgency Level</h3>
-                    <p className="text-white/50 mt-1">Determine response priority.</p>
-                  </div>
-                  <Badge variant="outline" className="border-indigo-500/50 text-indigo-400">Step 2/4</Badge>
-                </div>
-
-                <div className="space-y-4">
-                  {PRIORITY_LEVELS.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => setValue("priority", p.id as any, { shouldValidate: true })}
-                      className={cn(
-                        "w-full relative flex items-center justify-between p-6 rounded-xl border transition-all duration-300 group",
-                        selectedPriority === p.id
-                          ? "border-transparent bg-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]"
-                          : "border-white/10 hover:bg-white/5"
-                      )}
-                    >
-                      <div className="flex items-center gap-6">
-                        <div className="h-3 w-3 rounded-full shadow-[0_0_10px]" style={{ backgroundColor: p.color, boxShadow: `0 0 10px ${p.color}` }} />
-                        <div className="text-left">
-                          <div className="text-lg font-bold text-white tracking-wide uppercase">{p.name}</div>
-                          <div className="text-sm text-white/40">{p.description}</div>
-                        </div>
-                      </div>
-                      {selectedPriority === p.id && (
-                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="h-6 w-6 rounded-full bg-white text-black flex items-center justify-center">
-                          <Check className="h-4 w-4" />
-                        </motion.div>
-                      )}
-
-                      {/* Animated Highlight */}
-                      {selectedPriority === p.id && (
-                        <motion.div
-                          layoutId="priority-highlight"
-                          className="absolute inset-0 border border-white/20 rounded-xl"
-                          initial={false}
-                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            {step === 3 && (
-              <div
-                className="space-y-8 relative z-10"
-              >
-                <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                  <div>
-                    <h3 className="text-3xl font-bold text-white tracking-tight">Issue Details</h3>
-                    <p className="text-white/50 mt-1">Provide comprehensive documentation.</p>
-                  </div>
-                  <Badge variant="outline" className="border-indigo-500/50 text-indigo-400">Step 3/4</Badge>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Subject Title</Label>
-                    <Input
-                      {...register("title")}
-                      className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 text-xl font-medium focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20 transition-all h-14"
-                      placeholder="e.g. Broken Pipe in Restroom"
-                    />
-                    {errors.title && <p className="text-red-400 text-sm">{errors.title.message}</p>}
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="space-y-2">
-                      <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Hostel Block</Label>
-                      <Input
-                        {...register("hostel")}
-                        className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20"
-                        placeholder="Block A"
-                      />
-                      {errors.hostel && <p className="text-red-400 text-sm">{errors.hostel.message}</p>}
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Floor</Label>
-                      <Input
-                        {...register("floor")}
-                        className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20"
-                        placeholder="2nd"
-                      />
-                      {errors.floor && <p className="text-red-400 text-sm">{errors.floor.message}</p>}
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Room No.</Label>
-                      <Input
-                        {...register("room")}
-                        className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20"
-                        placeholder="101"
-                      />
-                      {errors.room && <p className="text-red-400 text-sm">{errors.room.message}</p>}
-                    </div>
-                  </div>
-
-                  {/* Hidden Inputs for Block/Floor completeness if needed, or we rely on session. For now user can edit Hostel/Room freely */}
-
-                  <div className="space-y-2">
-                    <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Description</Label>
-                    <Textarea
-                      {...register("description")}
-                      className="bg-white/5 border-white/10 focus-visible:ring-indigo-500/50 min-h-[150px] resize-none rounded-xl"
-                      placeholder="Describe the issue in detail..."
-                    />
-                    {errors.description && <p className="text-red-400 text-sm">{errors.description.message}</p>}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Digital Evidence</Label>
-                    <div {...getRootProps()} className={cn(
-                      "border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-300 group",
-                      isDragActive ? "border-indigo-500 bg-indigo-500/10" : "border-white/10 hover:border-white/30 hover:bg-white/5"
-                    )}>
-                      <input {...getInputProps()} />
-                      <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                        <Upload className="h-6 w-6 text-white/70" />
-                      </div>
-                      <p className="text-sm text-gray-400">Drop files here or click to upload</p>
-                    </div>
-
-                    {imagePreview.length > 0 && (
-                      <div className="flex gap-4 mt-4 overflow-x-auto pb-2">
-                        {imagePreview.map((src, i) => (
-                          <div key={i} className="relative h-20 w-20 flex-shrink-0 rounded-lg overflow-hidden group border border-white/20">
-                            <img src={src} className="h-full w-full object-cover" alt="preview" />
-                            <button type="button" onClick={() => removeImage(i)} className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
-                              <X className="h-5 w-5" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                {ISSUE_CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setValue("category", cat.id, { shouldValidate: true })}
+                    className={cn(
+                      "group relative p-6 rounded-xl border transition-all duration-300 flex flex-col items-center gap-4 text-center overflow-hidden",
+                      selectedCategory === cat.id
+                        ? "bg-indigo-500/20 border-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.2)]"
+                        : "bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10"
                     )}
+                  >
+                    <div className={cn(
+                      "p-4 rounded-full transition-all duration-300 group-hover:scale-110",
+                      selectedCategory === cat.id ? "bg-indigo-500 text-white" : "bg-white/10 text-white/70"
+                    )}>
+                      {categoryIcons[cat.id]}
+                    </div>
+                    <span className={cn("font-medium", selectedCategory === cat.id ? "text-white" : "text-white/60")}>
+                      {cat.name}
+                    </span>
+                    {selectedCategory === cat.id && (
+                      <motion.div layoutId="selection-ring" className="absolute inset-0 border-2 border-indigo-500 rounded-xl pointer-events-none" />
+                    )}
+                  </button>
+                ))}
+              </div>
+              {errors.category && <p className="text-red-400 text-sm animate-pulse">{errors.category.message}</p>}
+            </div>
+          )}
+
+          {step === 2 && (
+            <div
+              key="step2"
+              className="space-y-8 relative z-10"
+            >
+              <div className="flex justify-between items-end border-b border-white/10 pb-4">
+                <div>
+                  <h3 className="text-3xl font-bold text-white tracking-tight">Urgency Level</h3>
+                  <p className="text-white/50 mt-1">Determine response priority.</p>
+                </div>
+                <Badge variant="outline" className="border-indigo-500/50 text-indigo-400">Step 2/4</Badge>
+              </div>
+
+              <div className="space-y-4">
+                {PRIORITY_LEVELS.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setValue("priority", p.id as any, { shouldValidate: true })}
+                    className={cn(
+                      "w-full relative flex items-center justify-between p-6 rounded-xl border transition-all duration-300 group",
+                      selectedPriority === p.id
+                        ? "border-transparent bg-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]"
+                        : "border-white/10 hover:bg-white/5"
+                    )}
+                  >
+                    <div className="flex items-center gap-6">
+                      <div className="h-3 w-3 rounded-full shadow-[0_0_10px]" style={{ backgroundColor: p.color, boxShadow: `0 0 10px ${p.color}` }} />
+                      <div className="text-left">
+                        <div className="text-lg font-bold text-white tracking-wide uppercase">{p.name}</div>
+                        <div className="text-sm text-white/40">{p.description}</div>
+                      </div>
+                    </div>
+                    {selectedPriority === p.id && (
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="h-6 w-6 rounded-full bg-white text-black flex items-center justify-center">
+                        <Check className="h-4 w-4" />
+                      </motion.div>
+                    )}
+
+                    {/* Animated Highlight */}
+                    {selectedPriority === p.id && (
+                      <motion.div
+                        layoutId="priority-highlight"
+                        className="absolute inset-0 border border-white/20 rounded-xl"
+                        initial={false}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div
+              className="space-y-8 relative z-10"
+            >
+              <div className="flex justify-between items-end border-b border-white/10 pb-4">
+                <div>
+                  <h3 className="text-3xl font-bold text-white tracking-tight">Issue Details</h3>
+                  <p className="text-white/50 mt-1">Provide comprehensive documentation.</p>
+                </div>
+                <Badge variant="outline" className="border-indigo-500/50 text-indigo-400">Step 3/4</Badge>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Subject Title</Label>
+                  <Input
+                    {...register("title")}
+                    className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 text-xl font-medium focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20 transition-all h-14"
+                    placeholder="e.g. Broken Pipe in Restroom"
+                  />
+                  {errors.title && <p className="text-red-400 text-sm">{errors.title.message}</p>}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="space-y-2">
+                    <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Hostel Block</Label>
+                    <Input
+                      {...register("hostel")}
+                      className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20"
+                      placeholder="Block A"
+                    />
+                    {errors.hostel && <p className="text-red-400 text-sm">{errors.hostel.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Floor</Label>
+                    <Input
+                      {...register("floor")}
+                      className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20"
+                      placeholder="2nd"
+                    />
+                    {errors.floor && <p className="text-red-400 text-sm">{errors.floor.message}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Room No.</Label>
+                    <Input
+                      {...register("room")}
+                      className="bg-transparent border-0 border-b border-white/20 rounded-none px-0 focus-visible:ring-0 focus-visible:border-indigo-500 placeholder:text-white/20"
+                      placeholder="101"
+                    />
+                    {errors.room && <p className="text-red-400 text-sm">{errors.room.message}</p>}
+                  </div>
+                </div>
+
+                {/* Hidden Inputs for Block/Floor completeness if needed, or we rely on session. For now user can edit Hostel/Room freely */}
+
+                <div className="space-y-2">
+                  <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Description</Label>
+                  <Textarea
+                    {...register("description")}
+                    className="bg-white/5 border-white/10 focus-visible:ring-indigo-500/50 min-h-[150px] resize-none rounded-xl"
+                    placeholder="Describe the issue in detail..."
+                  />
+                  {errors.description && <p className="text-red-400 text-sm">{errors.description.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-indigo-300 text-xs uppercase tracking-widest font-bold">Digital Evidence</Label>
+                  <div {...getRootProps()} className={cn(
+                    "border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-300 group",
+                    isDragActive ? "border-indigo-500 bg-indigo-500/10" : "border-white/10 hover:border-white/30 hover:bg-white/5"
+                  )}>
+                    <input {...getInputProps()} />
+                    <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                      <Upload className="h-6 w-6 text-white/70" />
+                    </div>
+                    <p className="text-sm text-gray-400">Drop files here or click to upload</p>
+                  </div>
+
+                  {imagePreview.length > 0 && (
+                    <div className="flex gap-4 mt-4 overflow-x-auto pb-2">
+                      {imagePreview.map((src, i) => (
+                        <div key={i} className="relative h-20 w-20 flex-shrink-0 rounded-lg overflow-hidden group border border-white/20">
+                          <img src={src} className="h-full w-full object-cover" alt="preview" />
+                          <button type="button" onClick={() => removeImage(i)} className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
+                            <X className="h-5 w-5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div
+              key="step4"
+              className="space-y-8 relative z-10"
+            >
+              <div className="flex justify-between items-end border-b border-white/10 pb-4">
+                <div>
+                  <h3 className="text-3xl font-bold text-white tracking-tight">Final Verification</h3>
+                  <p className="text-white/50 mt-1">Review data before submission.</p>
+                </div>
+                <Badge variant="outline" className="border-indigo-500/50 text-indigo-400">Step 4/4</Badge>
+              </div>
+
+              <div className="bg-white/5 rounded-2xl border border-white/10 p-6 space-y-6">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="text-xl font-bold text-white mb-2">{watch("title")}</h4>
+                    <p className="text-white/60 text-sm leading-relaxed">{watch("description")}</p>
+                  </div>
+                  <Badge variant={selectedPriority as any} className="capitalize px-3 py-1 text-sm">{selectedPriority} Priority</Badge>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/10">
+                  <div className="p-4 rounded-xl bg-black/20 border border-white/5">
+                    <div className="text-xs text-white/40 uppercase tracking-widest mb-1">Category</div>
+                    <div className="flex items-center gap-2 text-white">
+                      {categoryIcons[selectedCategory]}
+                      <span className="capitalize">{ISSUE_CATEGORIES.find(c => c.id === selectedCategory)?.name}</span>
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-xl bg-black/20 border border-white/5">
+                    <div className="text-xs text-white/40 uppercase tracking-widest mb-1">Location</div>
+                    <div className="text-white font-medium">
+                      {watch("hostel")} • Room {watch("room")}
+                    </div>
                   </div>
                 </div>
               </div>
-            )}
-
-            {step === 4 && (
-              <motion.div
-                key="step4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="space-y-8 relative z-10"
-              >
-                <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                  <div>
-                    <h3 className="text-3xl font-bold text-white tracking-tight">Final Verification</h3>
-                    <p className="text-white/50 mt-1">Review data before submission.</p>
-                  </div>
-                  <Badge variant="outline" className="border-indigo-500/50 text-indigo-400">Step 4/4</Badge>
-                </div>
-
-                <div className="bg-white/5 rounded-2xl border border-white/10 p-6 space-y-6">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h4 className="text-xl font-bold text-white mb-2">{watch("title")}</h4>
-                      <p className="text-white/60 text-sm leading-relaxed">{watch("description")}</p>
-                    </div>
-                    <Badge variant={selectedPriority as any} className="capitalize px-3 py-1 text-sm">{selectedPriority} Priority</Badge>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/10">
-                    <div className="p-4 rounded-xl bg-black/20 border border-white/5">
-                      <div className="text-xs text-white/40 uppercase tracking-widest mb-1">Category</div>
-                      <div className="flex items-center gap-2 text-white">
-                        {categoryIcons[selectedCategory]}
-                        <span className="capitalize">{ISSUE_CATEGORIES.find(c => c.id === selectedCategory)?.name}</span>
-                      </div>
-                    </div>
-                    <div className="p-4 rounded-xl bg-black/20 border border-white/5">
-                      <div className="text-xs text-white/40 uppercase tracking-widest mb-1">Location</div>
-                      <div className="text-white font-medium">
-                        {watch("hostel")} • Room {watch("room")}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            </div>
+          )}
 
           {/* Navigation Controls */}
           <div className="mt-10 flex justify-between pt-6 border-t border-white/10 relative z-10">
@@ -485,6 +475,6 @@ export function IssueReportForm() {
           </div>
         </form>
       </div>
-    </div>
+    </div >
   );
 }
