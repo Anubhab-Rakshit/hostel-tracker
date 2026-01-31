@@ -215,6 +215,10 @@ export function IssueReportForm() {
           <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
           <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 via-transparent to-transparent pointer-events-none" />
 
+          {/* Hidden inputs to ensure RHF registration */}
+          <input type="hidden" {...register("category")} />
+          <input type="hidden" {...register("priority")} />
+
           <AnimatePresence mode="wait">
             {step === 1 && (
               <motion.div
@@ -237,7 +241,7 @@ export function IssueReportForm() {
                     <button
                       key={cat.id}
                       type="button"
-                      onClick={() => setValue("category", cat.id)}
+                      onClick={() => setValue("category", cat.id, { shouldValidate: true })}
                       className={cn(
                         "group relative p-6 rounded-xl border transition-all duration-300 flex flex-col items-center gap-4 text-center overflow-hidden",
                         selectedCategory === cat.id
@@ -285,7 +289,7 @@ export function IssueReportForm() {
                     <button
                       key={p.id}
                       type="button"
-                      onClick={() => setValue("priority", p.id as any)}
+                      onClick={() => setValue("priority", p.id as any, { shouldValidate: true })}
                       className={cn(
                         "w-full flex items-center justify-between p-6 rounded-xl border transition-all duration-300 group",
                         selectedPriority === p.id

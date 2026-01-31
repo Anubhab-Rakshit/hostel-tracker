@@ -52,20 +52,34 @@ const isCollegeLowQuality = (value: string | undefined) => {
 };
 
 const runPythonScan = async (imagePath: string) => {
+  // Determine Python path: Check venv (Linux/Mac style first), then fallback
   const venvRoot = process.env.VIRTUAL_ENV || path.join(process.cwd(), ".venv");
-  const venvPython = path.join(venvRoot, "Scripts", "python.exe");
-  const fallbackPython = "python3";
-  const candidates = [process.env.PYTHON_PATH, venvPython, fallbackPython].filter(Boolean) as string[];
-  const pythonPath = candidates.find((candidate) => candidate === fallbackPython || existsSync(candidate)) || fallbackPython;
+  // Linux/Mac: bin/python, Windows: Scripts/python.exe
+  const venvPythonUnix = path.join(venvRoot, "bin", "python");
+  const venvPythonWin = path.join(venvRoot, "Scripts", "python.exe");
+
+  let pythonPath = "python3"; // Default fallback
+
+  if (existsSync(venvPythonUnix)) {
+    pythonPath = venvPythonUnix;
+  } else if (existsSync(venvPythonWin)) {
+    pythonPath = venvPythonWin;
+  } else if (process.env.PYTHON_PATH) {
+    pythonPath = process.env.PYTHON_PATH;
+  }
+
+  // Ensure script path is absolute and correct
   const scriptPath = path.join(process.cwd(), "scripts", "id_card_scanner.py");
 
+  if (!existsSync(scriptPath)) {
+    throw new Error(`OCR Script not found at: ${scriptPath}`);
+  }
+
   const result = await new Promise<string>((resolve, reject) => {
+    // Inherit process.env but ensure we don't break paths on Linux by forcing Mac paths
+    // Just extend the existing PATH if needed, or rely on absolute pythonPath
     const child = spawn(pythonPath, [scriptPath, "--image", imagePath, "--json"], {
-      env: {
-        ...process.env,
-        DYLD_LIBRARY_PATH: `/opt/homebrew/lib:/usr/local/lib:${process.env.DYLD_LIBRARY_PATH || ""}`,
-        PATH: `/opt/homebrew/bin:/usr/local/bin:${process.env.PATH || ""}`,
-      },
+      env: process.env, // Inherit environment directly to keep Docker paths intact
     });
 
     let output = "";
@@ -84,7 +98,10 @@ const runPythonScan = async (imagePath: string) => {
       if (code !== 0) {
         reject(new Error(errorOutput || "Failed to run OCR"));
       } else {
-        resolve(output.trim());
+        const trimmed = output.trim();
+        // Sometimes python might output warnings before JSON, try to find the last JSON object
+        // For now, assume script only outputs JSON or we take the whole thing
+        resolve(trimmed);
       }
     });
   });

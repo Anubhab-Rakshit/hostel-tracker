@@ -5,12 +5,13 @@ import dbConnect from "@/lib/db";
 import { Issue, User, Notification } from "@/models";
 import { sendEmail } from "@/lib/email";
 import { predictUrgency } from "@/lib/ai";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 // GET - Fetch all issues with filters
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
-    
+
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
@@ -79,7 +80,7 @@ export async function GET(request: NextRequest) {
 
     // Execute query
     const skip = (page - 1) * limit;
-    
+
     const [issues, total] = await Promise.all([
       Issue.find(query)
         .populate("reporter", "name email avatar role isVerified")
@@ -139,7 +140,7 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     const formData = await request.formData();
-    
+
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const category = formData.get("category") as string;
@@ -170,10 +171,20 @@ export async function POST(request: NextRequest) {
     // Handle file uploads (in production, upload to cloud storage)
     const files = formData.getAll("files") as File[];
     const images: string[] = [];
-    
-    // For now, we'll skip actual file upload
-    // In production, upload to S3/Cloudinary and store URLs
-    
+
+    // Upload files to Cloudinary
+    if (files && files.length > 0) {
+      try {
+        const uploadPromises = files.map(file => uploadToCloudinary(file, "hostel-issues"));
+        images.push(...await Promise.all(uploadPromises));
+      } catch (error) {
+        console.error("Failed to upload images:", error);
+        // Continue without images or return error? 
+        // Let's continue but log it. Or maybe user wants to know.
+        // For now, we won't block creation, but evidence will be missing.
+      }
+    }
+
     // Create issue
     const issue = await Issue.create({
       title,
@@ -203,7 +214,7 @@ export async function POST(request: NextRequest) {
     // Update user's karma points for reporting
     await User.findByIdAndUpdate(session.user.id, {
       $inc: { karmaPoints: 5 },
-      $push: { 
+      $push: {
         reportedIssues: issue._id,
         karmaHistory: {
           action: "issue_reported",

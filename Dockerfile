@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     libzbar0 \
     tesseract-ocr \
     build-essential \
+    libgl1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
