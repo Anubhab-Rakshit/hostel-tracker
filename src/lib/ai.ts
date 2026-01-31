@@ -1,7 +1,8 @@
 import Groq from "groq-sdk";
 
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+  apiKey: process.env.GROQ_API_KEY || "dummy",
+  dangerouslyAllowBrowser: true, // Only if needed, but safe here as it's server-side lib
 });
 
 export interface CategoryPrediction {
@@ -79,7 +80,7 @@ Respond in valid JSON format:
     }
 
     const prediction = JSON.parse(response) as CategoryPrediction;
-    
+
     // Validate category
     if (!categories.includes(prediction.category)) {
       prediction.category = "other";
@@ -232,7 +233,7 @@ function fallbackUrgency(description: string): UrgencyPrediction {
 
 function fallbackPrediction(description: string): CategoryPrediction {
   const descLower = description.toLowerCase();
-  
+
   const keywordMap: Record<string, string[]> = {
     plumbing: ["water", "leak", "tap", "pipe", "drain", "bathroom", "toilet", "sink", "shower", "flood"],
     electrical: ["light", "switch", "power", "socket", "fan", "bulb", "wire", "electric", "voltage", "short circuit"],
