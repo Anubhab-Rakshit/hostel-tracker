@@ -146,7 +146,11 @@ export function IssueReportForm() {
     else if (step === 2) isValid = await trigger(["priority"]);
     else if (step === 3) isValid = await trigger(["title", "description", "hostel", "block", "floor", "room"]);
 
-    if (isValid) setStep((prev) => Math.min(prev + 1, 4));
+    if (isValid) {
+      setStep((prev) => Math.min(prev + 1, 4));
+    } else {
+      toast.error("Please fill all required fields before proceeding.");
+    }
   };
 
   const onSubmit = async (data: IssueFormData) => {

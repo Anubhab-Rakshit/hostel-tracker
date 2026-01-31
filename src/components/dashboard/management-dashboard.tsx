@@ -50,6 +50,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn, ISSUE_CATEGORIES, STATUS_LABELS, HOSTELS, formatRelativeTime } from "@/lib/utils";
 import { toast } from "sonner";
+import { AnnouncementCreator } from "@/components/management/announcement-creator";
 
 interface StatCardProps {
   title: string;
@@ -151,11 +152,11 @@ export function ManagementDashboard() {
     );
     const avgResolutionHours = resolvedWithTimes.length
       ? resolvedWithTimes.reduce((sum: number, issue: any) => {
-          const created = new Date(issue.createdAt).getTime();
-          const resolvedAt = issue.resolvedAt ? new Date(issue.resolvedAt).getTime() : created;
-          const hours = Math.max((resolvedAt - created) / (1000 * 60 * 60), 0);
-          return sum + hours;
-        }, 0) / resolvedWithTimes.length
+        const created = new Date(issue.createdAt).getTime();
+        const resolvedAt = issue.resolvedAt ? new Date(issue.resolvedAt).getTime() : created;
+        const hours = Math.max((resolvedAt - created) / (1000 * 60 * 60), 0);
+        return sum + hours;
+      }, 0) / resolvedWithTimes.length
       : 0;
 
     // Trend: last 7 days
@@ -375,6 +376,40 @@ export function ManagementDashboard() {
         />
       </div>
 
+      {/* Action Row: Announcements & Red Alerts */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <AnnouncementCreator onCreated={loadDashboard} />
+        </div>
+
+        {/* Red Alerts */}
+        <Card className="lg:col-span-1 border-red-500/30 bg-red-500/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-red-500">
+              <Zap className="h-5 w-5" />
+              Red Alerts
+            </CardTitle>
+            <CardDescription>Immediate attention required</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {redAlerts.length === 0 && (
+              <p className="text-sm text-muted-foreground">No red alerts right now.</p>
+            )}
+            {redAlerts.map((issue: any) => (
+              <div
+                key={issue._id}
+                className="rounded-lg border border-red-500/20 bg-red-500/10 p-3"
+              >
+                <p className="text-sm font-semibold text-red-500">{issue.title}</p>
+                <p className="text-xs text-muted-foreground">
+                  {issue.hostel} • {formatRelativeTime(issue.createdAt)}
+                </p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Issues Trend */}
@@ -557,34 +592,7 @@ export function ManagementDashboard() {
 
       {/* Third Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Red Alerts */}
-        <Card className="lg:col-span-1 border-red-500/30 bg-red-500/5">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-500">
-              <Zap className="h-5 w-5" />
-              Red Alerts
-            </CardTitle>
-            <CardDescription>Immediate attention required</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {redAlerts.length === 0 && (
-              <p className="text-sm text-muted-foreground">No red alerts right now.</p>
-            )}
-            {redAlerts.map((issue: any) => (
-              <div
-                key={issue._id}
-                className="rounded-lg border border-red-500/20 bg-red-500/10 p-3"
-              >
-                <p className="text-sm font-semibold text-red-500">{issue.title}</p>
-                <p className="text-xs text-muted-foreground">
-                  {issue.hostel} • {formatRelativeTime(issue.createdAt)}
-                </p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Recent Issues */}
+        {/* Recent Issues (Expanded to 2 cols) */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <div className="flex items-center justify-between">
