@@ -326,11 +326,7 @@ export function IssueReportForm() {
             )}
 
             {step === 3 && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
+              <div
                 className="space-y-8 relative z-10"
               >
                 <div className="flex justify-between items-end border-b border-white/10 pb-4">
@@ -421,7 +417,7 @@ export function IssueReportForm() {
                     )}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {step === 4 && (
