@@ -501,7 +501,7 @@ export default function IssueDetailPage() {
                         <p className="font-semibold text-sm capitalize">{STATUS_LABELS.find(s => s.id === history.status)?.name}</p>
                         <p className="text-xs text-gray-500 mb-1">{format(new Date(history.timestamp), "MMM d, h:mm a")}</p>
                         {history.remarks && (
-                          <p className="text-xs text-gray-400 mt-2 bg-black/20 p-2 rounded italic">"{history.remarks}"</p>
+                          <p className="text-xs text-gray-400 mt-2 bg-black/20 p-2 rounded italic">&quot;{history.remarks}&quot;</p>
                         )}
                       </div>
                     </motion.div>

@@ -99,7 +99,7 @@ export function CommandPalette() {
                                 {query && (
                                     <div className="p-8 text-center text-gray-500">
                                         <Search className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                                        <p>Searching for "<span className="text-white">{query}</span>"...</p>
+                                        <p>Searching for &quot;<span className="text-white">{query}</span>&quot;...</p>
                                     </div>
                                 )}
                             </div>
