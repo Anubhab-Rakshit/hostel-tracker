@@ -356,34 +356,57 @@ def parse_fields(text: str) -> dict:
     }
 
 
+def resize_image(image: cv2.typing.MatLike, max_dim: int = 1024) -> cv2.typing.MatLike:
+    h, w = image.shape[:2]
+    if max(h, w) <= max_dim:
+        return image
+    scale = max_dim / max(h, w)
+    new_w = int(w * scale)
+    new_h = int(h * scale)
+    return cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+
 def ocr_best(image: cv2.typing.MatLike) -> str:
+    # Resize for speed - OCR works better/faster on reasonable sizes (~800-1000px width)
+    processed_img = resize_image(image, max_dim=1000)
+    
     rotations = [
-        (0, image),
-        (90, cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)),
-        (180, cv2.rotate(image, cv2.ROTATE_180)),
-        (270, cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)),
+        (0, processed_img),
+        (90, cv2.rotate(processed_img, cv2.ROTATE_90_CLOCKWISE)),
+        (180, cv2.rotate(processed_img, cv2.ROTATE_180)),
+        (270, cv2.rotate(processed_img, cv2.ROTATE_90_COUNTERCLOCKWISE)),
     ]
 
     best_text = ""
     best_score = -1.0
 
-    for _, rotated in rotations:
+    print("OCR Debug: Starting rotation check loop...")
+    for angle, rotated in rotations:
         gray = cv2.cvtColor(rotated, cv2.COLOR_BGR2GRAY)
-        gray = cv2.bilateralFilter(gray, 9, 75, 75)
+        # Faster preprocessing
+        gray = cv2.bilateralFilter(gray, 5, 50, 50) 
         thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
 
-        data = pytesseract.image_to_data(thresh, output_type=pytesseract.Output.DICT)
-        texts = [t for t in data.get("text", []) if t.strip()]
+        # Use a single, robust config first to save time
+        # --psm 6Assume a single uniform block of text. Good for ID cards.
+        data = pytesseract.image_to_data(thresh, output_type=pytesseract.Output.DICT, config="--oem 1 --psm 6")
+        
         confs = [float(c) for c in data.get("conf", []) if c != "-1"]
         score = (sum(confs) / len(confs)) if confs else 0.0
+        
+        print(f"OCR Debug: Angle {angle} score: {score:.2f}")
 
-        base_text = pytesseract.image_to_string(thresh)
-        psm6_text = pytesseract.image_to_string(thresh, config="--oem 1 --psm 6")
-        psm11_text = pytesseract.image_to_string(thresh, config="--oem 1 --psm 11")
-        text = " ".join(texts) + "\n" + base_text + "\n" + psm6_text + "\n" + psm11_text
-        if score > best_score and len(text.strip()) > 20:
-            best_score = score
-            best_text = text
+        if score > best_score:
+            # Only extract full text if this angle looks promising
+            text = pytesseract.image_to_string(thresh, config="--oem 1 --psm 6")
+            if len(text.strip()) > 10:
+                best_score = score
+                best_text = text
+
+        # Early exit if we have a very high confidence result
+        if score > 80:
+             print("OCR Debug: High confidence match found, stopping rotations.")
+             break
 
     return best_text
 
@@ -562,7 +585,9 @@ def scan_image(image_path: str) -> ScanResult:
         qr_data = barcodes[0].data.decode("utf-8", errors="ignore")
 
     ocr_text = ocr_best(image)
-    header_text = extract_prominent_header(image)
+    # Use resized for header extraction too, it's heuristics based
+    resized_for_header = resize_image(image, max_dim=1200)
+    header_text = extract_prominent_header(resized_for_header)
 
     combined_text = ocr_text + ("\n" + qr_data if qr_data else "")
     if header_text:
